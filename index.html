@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Optima AI — Modern AI Photo & Video Editor</title>
+    <title>Optima AI — optima-ai.vercel.app</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
         body { background: #0a0a0c; color: #fff; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
@@ -11,6 +11,7 @@
         header { padding: 10px 16px; background: #13131a; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: space-between; }
         .brand { font-weight: 800; font-size: 1.15rem; color: #fff; display: flex; align-items: center; gap: 10px; }
         .brand-text { background: linear-gradient(135deg, #6366f1, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .domain-tag { font-size: 0.7rem; color: #888; font-weight: 500; display: block; margin-top: -2px; }
         .header-btns { display: flex; gap: 8px; }
         
         .btn-sm { background: #1c1c28; border: 1px solid #333; color: #fff; padding: 6px 12px; border-radius: 16px; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 4px; }
@@ -37,6 +38,8 @@
         .btn-plus { background: #1c1c28; border: 1px solid #333; color: #a855f7; width: 40px; height: 40px; border-radius: 50%; font-size: 1.4rem; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
         .btn-send { background: linear-gradient(135deg, #6366f1, #a855f7); border: none; color: #fff; width: 40px; height: 40px; border-radius: 50%; font-weight: bold; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
 
+        .domain-footer { text-align: center; font-size: 0.65rem; color: #555; padding: 4px; background: #0a0a0c; border-top: 1px solid #1a1a22; }
+
         /* Modal Settings */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
         .modal.active { display: flex; }
@@ -50,7 +53,6 @@
 
     <header>
         <div class="brand">
-            <!-- Custom Optima AI SVG Logo -->
             <svg width="30" height="30" viewBox="0 0 512 512" style="display:block;">
                 <defs>
                     <linearGradient id="logoBg" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -63,7 +65,10 @@
                 <path d="M 170 340 L 290 220" stroke="#ffffff" stroke-width="36" stroke-linecap="round"/>
                 <path d="M 330 140 Q 330 175 365 175 Q 330 175 330 210 Q 330 175 295 175 Q 330 175 330 140 Z" fill="#ffffff"/>
             </svg>
-            <span class="brand-text">Optima AI</span>
+            <div>
+                <span class="brand-text">Optima AI</span>
+                <span class="domain-tag">optima-ai.vercel.app</span>
+            </div>
         </div>
         <div class="header-btns">
             <button class="btn-sm" onclick="downloadImage()">💾 Download</button>
@@ -83,7 +88,7 @@
 
     <div class="chat-box">
         <div class="messages" id="messages">
-            <div class="msg ai">Hello! Tap <strong>+</strong> to attach a photo or video. Try the filters below!</div>
+            <div class="msg ai">Hello! Tap <strong>+</strong> to attach a photo or video. Applied filters automatically include the <strong>Optima AI</strong> watermark!</div>
         </div>
 
         <div class="chips">
@@ -102,6 +107,7 @@
             <input type="text" id="text-input" placeholder="Type instruction or prompt..." onkeydown="if(event.key==='Enter') send()">
             <button class="btn-send" onclick="send()">➔</button>
         </div>
+        <div class="domain-footer">Powered by Optima AI — optima-ai.vercel.app</div>
     </div>
 
     <!-- Settings Modal -->
@@ -156,6 +162,7 @@
                         canvas.width = img.width;
                         canvas.height = img.height;
                         ctx.drawImage(img, 0, 0);
+                        drawWatermark(ctx, canvas.width, canvas.height);
                         canvas.style.display = 'block';
                         document.getElementById('video').style.display = 'none';
                     };
@@ -168,9 +175,20 @@
                 }
 
                 addMsg('user', `Attached: ${file.name}`);
-                addMsg('ai', "Media loaded! Tap a filter above or type an instruction.");
+                addMsg('ai', "Media loaded! Tap a filter above to transform it.");
             };
             reader.readAsDataURL(file);
+        }
+
+        function drawWatermark(ctx, w, h) {
+            const fontSize = Math.max(16, Math.floor(w * 0.035));
+            ctx.font = `800 ${fontSize}px sans-serif`;
+            ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
+            ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
+            ctx.shadowBlur = 6;
+            ctx.textAlign = "right";
+            ctx.fillText("✨ Optima AI", w - (fontSize * 0.8), h - (fontSize * 0.8));
+            ctx.shadowBlur = 0; // Reset
         }
 
         function send() {
@@ -222,6 +240,7 @@
             ctx.drawImage(originalImg, 0, 0);
 
             if (type === 'reset') {
+                drawWatermark(ctx, canvas.width, canvas.height);
                 addMsg('ai', "Reset image to original.");
                 return;
             }
@@ -258,7 +277,8 @@
                 }
             }
             ctx.putImageData(imgData, 0, 0);
-            addMsg('ai', `Applied ${type} style!`);
+            drawWatermark(ctx, canvas.width, canvas.height);
+            addMsg('ai', `Applied ${type} style with Optima AI watermark!`);
         }
 
         function downloadImage() {
@@ -268,7 +288,7 @@
                 return;
             }
             const link = document.createElement('a');
-            link.download = 'optima-ai-edit.png';
+            link.download = 'optima-ai-watermarked.png';
             link.href = canvas.toDataURL();
             link.click();
         }
@@ -284,5 +304,3 @@
     </script>
 </body>
 </html>
-
-        
