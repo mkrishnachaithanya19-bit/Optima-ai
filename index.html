@@ -36,7 +36,7 @@
         .btn-plus { background: #1c1c28; border: 1px solid #333; color: #a855f7; width: 40px; height: 40px; border-radius: 50%; font-size: 1.4rem; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
         .btn-send { background: linear-gradient(135deg, #6366f1, #a855f7); border: none; color: #fff; width: 40px; height: 40px; border-radius: 50%; font-weight: bold; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
 
-        /* Modal Settings */
+        /* Settings Modal */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
         .modal.active { display: flex; }
         .modal-card { background: #13131a; border: 1px solid #333; border-radius: 16px; width: 100%; max-width: 400px; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
@@ -104,7 +104,6 @@
         let originalImg = null;
         let isVid = false;
 
-        // Load saved API key on startup
         document.addEventListener('DOMContentLoaded', () => {
             const savedKey = localStorage.getItem('optima_gemini_key') || '';
             document.getElementById('api-key-input').value = savedKey;
@@ -188,7 +187,6 @@
                     }
                 }
 
-                // Fallback / Preset filters
                 if (lower.includes('cinematic')) applyPreset('cinematic');
                 else if (lower.includes('warm')) applyPreset('warm');
                 else if (lower.includes('cool')) applyPreset('cool');
@@ -270,5 +268,3 @@
     </script>
 </body>
 </html>
-
-                    
