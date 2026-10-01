@@ -3,40 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Optima AI — optima-ai.vercel.app</title>
+    <title>Optima AI Studio — optima-ai.vercel.app</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
         body { background: #0a0a0c; color: #fff; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         
         header { padding: 10px 16px; background: #13131a; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: space-between; }
-        .brand { font-weight: 800; font-size: 1.15rem; color: #fff; display: flex; align-items: center; gap: 10px; }
+        .brand { font-weight: 800; font-size: 1.1rem; color: #fff; display: flex; align-items: center; gap: 8px; }
         .brand-text { background: linear-gradient(135deg, #6366f1, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .domain-tag { font-size: 0.7rem; color: #888; font-weight: 500; display: block; margin-top: -2px; }
-        .header-btns { display: flex; gap: 8px; }
+        .domain-tag { font-size: 0.65rem; color: #888; font-weight: 500; display: block; margin-top: -2px; }
+        .header-btns { display: flex; gap: 6px; }
         
-        .btn-sm { background: #1c1c28; border: 1px solid #333; color: #fff; padding: 6px 12px; border-radius: 16px; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 4px; }
-        .btn-accent { background: linear-gradient(135deg, #6366f1, #a855f7); border: none; }
+        .btn-sm { background: #1c1c28; border: 1px solid #333; color: #fff; padding: 6px 10px; border-radius: 14px; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+        .btn-accent { background: linear-gradient(135deg, #6366f1, #a855f7); border: none; font-weight: bold; }
 
         .stage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px; position: relative; overflow: hidden; background: #070709; }
         .welcome { text-align: center; max-width: 320px; }
         .btn-upload-lg { background: linear-gradient(135deg, #6366f1, #a855f7); color: #fff; border: none; padding: 12px 24px; border-radius: 24px; font-weight: bold; font-size: 0.95rem; margin-top: 14px; cursor: pointer; }
         
-        canvas, video { max-width: 100%; max-height: 230px; border-radius: 12px; display: none; object-fit: contain; box-shadow: 0 8px 24px rgba(0,0,0,0.6); }
+        .canvas-wrapper { position: relative; max-width: 100%; max-height: 240px; display: none; align-items: center; justify-content: center; }
+        canvas, video { max-width: 100%; max-height: 240px; border-radius: 12px; object-fit: contain; box-shadow: 0 8px 24px rgba(0,0,0,0.6); }
         
-        .chat-box { height: 340px; background: #13131a; border-top: 1px solid #222; display: flex; flex-direction: column; }
-        .messages { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
-        .msg { padding: 10px 14px; border-radius: 12px; font-size: 0.88rem; max-width: 85%; word-break: break-word; line-height: 1.4; }
+        /* Control Studio Panel */
+        .studio-panel { height: 350px; background: #13131a; border-top: 1px solid #222; display: flex; flex-direction: column; }
+        
+        /* Studio Navigation Tabs */
+        .tab-bar { display: flex; background: #0a0a0c; border-bottom: 1px solid #222; }
+        .tab-btn { flex: 1; padding: 10px 4px; background: transparent; border: none; color: #888; font-size: 0.8rem; font-weight: bold; cursor: pointer; border-bottom: 2px solid transparent; }
+        .tab-btn.active { color: #a855f7; border-bottom-color: #a855f7; background: #13131a; }
+
+        .tab-content { flex: 1; overflow-y: auto; padding: 12px; display: none; flex-direction: column; gap: 12px; }
+        .tab-content.active { display: flex; }
+
+        /* Sliders Layout */
+        .slider-group { display: flex; flex-direction: column; gap: 4px; }
+        .slider-header { display: flex; justify-content: space-between; font-size: 0.78rem; color: #aaa; }
+        input[type="range"] { accent-color: #a855f7; width: 100%; height: 6px; background: #222; border-radius: 3px; outline: none; }
+
+        /* AI Chat List */
+        .messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; max-height: 180px; }
+        .msg { padding: 8px 12px; border-radius: 12px; font-size: 0.85rem; max-width: 88%; word-break: break-word; line-height: 1.3; }
         .msg.ai { background: #1c1c28; align-self: flex-start; border: 1px solid #2a2a3c; }
         .msg.user { background: linear-gradient(135deg, #6366f1, #a855f7); align-self: flex-end; }
-        
-        .chips { display: flex; gap: 8px; overflow-x: auto; padding: 8px 12px; background: #0a0a0c; scrollbar-width: none; }
+
+        .chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
         .chips::-webkit-scrollbar { display: none; }
-        .chip { background: #1c1c28; border: 1px solid #333; color: #fff; padding: 6px 12px; border-radius: 16px; font-size: 0.78rem; white-space: nowrap; cursor: pointer; }
+        .chip { background: #1c1c28; border: 1px solid #333; color: #fff; padding: 6px 12px; border-radius: 16px; font-size: 0.78rem; white-space: nowrap; cursor: pointer; flex-shrink: 0; }
+
+        .input-bar { padding: 8px 12px; display: flex; gap: 8px; background: #13131a; align-items: center; border-top: 1px solid #222; }
+        input[type="text"], input[type="color"] { background: #1c1c28; border: 1px solid #333; color: #fff; padding: 8px 12px; border-radius: 18px; outline: none; font-size: 0.85rem; }
+        input[type="text"] { flex: 1; }
         
-        .input-bar { padding: 10px; display: flex; gap: 8px; background: #13131a; align-items: center; }
-        input[type="text"] { flex: 1; background: #1c1c28; border: 1px solid #333; color: #fff; padding: 10px 14px; border-radius: 20px; outline: none; font-size: 0.9rem; }
-        .btn-plus { background: #1c1c28; border: 1px solid #333; color: #a855f7; width: 40px; height: 40px; border-radius: 50%; font-size: 1.4rem; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
-        .btn-send { background: linear-gradient(135deg, #6366f1, #a855f7); border: none; color: #fff; width: 40px; height: 40px; border-radius: 50%; font-weight: bold; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+        .btn-plus { background: #1c1c28; border: 1px solid #333; color: #a855f7; width: 36px; height: 36px; border-radius: 50%; font-size: 1.3rem; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+        .btn-send { background: linear-gradient(135deg, #6366f1, #a855f7); border: none; color: #fff; width: 36px; height: 36px; border-radius: 50%; font-weight: bold; font-size: 1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
 
         .domain-footer { text-align: center; font-size: 0.65rem; color: #555; padding: 4px; background: #0a0a0c; border-top: 1px solid #1a1a22; }
 
@@ -46,14 +65,13 @@
         .modal-card { background: #13131a; border: 1px solid #333; border-radius: 16px; width: 100%; max-width: 400px; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
         .modal-card h3 { font-size: 1.1rem; color: #a855f7; }
         .modal-card label { font-size: 0.8rem; color: #aaa; }
-        .modal-card input { background: #1c1c28; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 8px; outline: none; width: 100%; font-size: 0.85rem; }
     </style>
 </head>
 <body>
 
     <header>
         <div class="brand">
-            <svg width="30" height="30" viewBox="0 0 512 512" style="display:block;">
+            <svg width="28" height="28" viewBox="0 0 512 512" style="display:block;">
                 <defs>
                     <linearGradient id="logoBg" x1="0%" y1="0%" x2="100%" y2="100%">
                         <stop offset="0%" stop-color="#6366f1"/>
@@ -66,81 +84,148 @@
                 <path d="M 330 140 Q 330 175 365 175 Q 330 175 330 210 Q 330 175 295 175 Q 330 175 330 140 Z" fill="#ffffff"/>
             </svg>
             <div>
-                <span class="brand-text">Optima AI</span>
+                <span class="brand-text">Optima AI Studio</span>
                 <span class="domain-tag">optima-ai.vercel.app</span>
             </div>
         </div>
         <div class="header-btns">
-            <button class="btn-sm" onclick="downloadImage()">💾 Download</button>
-            <button class="btn-sm" onclick="toggleSettings()">⚙️ Settings</button>
+            <button class="btn-sm btn-accent" onclick="downloadImage()">💾 Save</button>
+            <button class="btn-sm" onclick="toggleSettings()">⚙️</button>
         </div>
     </header>
     
     <div class="stage">
         <div class="welcome" id="welcome">
             <h2>What would you like to edit?</h2>
-            <p style="color:#888; font-size:0.85rem; margin-top:6px;">Upload a photo or video to begin.</p>
+            <p style="color:#888; font-size:0.85rem; margin-top:6px;">Upload a photo or video to launch Optima AI Studio.</p>
             <button class="btn-upload-lg" onclick="document.getElementById('file-input').click()">+ Select Media</button>
         </div>
-        <canvas id="canvas"></canvas>
-        <video id="video" controls></video>
+        <div class="canvas-wrapper" id="canvas-wrapper">
+            <canvas id="canvas"></canvas>
+            <video id="video" controls style="display:none;"></video>
+        </div>
     </div>
 
-    <div class="chat-box">
-        <div class="messages" id="messages">
-            <div class="msg ai">Hello! Tap <strong>+</strong> to attach a photo or video. Applied filters automatically include the <strong>Optima AI</strong> watermark!</div>
+    <!-- Studio Panel with Navigation Tabs -->
+    <div class="studio-panel">
+        <div class="tab-bar">
+            <button class="tab-btn active" onclick="switchTab('ai-tab')">✨ AI Assistant</button>
+            <button class="tab-btn" onclick="switchTab('filters-tab')">🎨 Filters</button>
+            <button class="tab-btn" onclick="switchTab('adjust-tab')">🎛 Adjust</button>
+            <button class="tab-btn" onclick="switchTab('text-tab')">📝 Text & Overlay</button>
         </div>
 
-        <div class="chips">
-            <button class="chip" onclick="applyPreset('cinematic')">🎬 Cinematic</button>
-            <button class="chip" onclick="applyPreset('warm')">☀️ Warm</button>
-            <button class="chip" onclick="applyPreset('cool')">❄️ Cool</button>
-            <button class="chip" onclick="applyPreset('bw')">🔳 B&W</button>
-            <button class="chip" onclick="applyPreset('contrast')">⚡ High Contrast</button>
-            <button class="chip" onclick="applyPreset('sepia')">📜 Sepia</button>
-            <button class="chip" onclick="applyPreset('reset')">🔄 Reset</button>
+        <!-- AI Assistant Tab -->
+        <div class="tab-content active" id="ai-tab">
+            <div class="messages" id="messages">
+                <div class="msg ai">Welcome to <strong>Optima AI Studio</strong>! Tap <strong>+</strong> to upload a photo/video or use the tabs above to edit manually.</div>
+            </div>
+            <div class="chips">
+                <button class="chip" onclick="applyPreset('cinematic')">🎬 Cinematic</button>
+                <button class="chip" onclick="applyPreset('warm')">☀️ Warm</button>
+                <button class="chip" onclick="applyPreset('cool')">❄️ Cool</button>
+                <button class="chip" onclick="applyPreset('bw')">🔳 B&W</button>
+                <button class="chip" onclick="applyPreset('reset')">🔄 Reset All</button>
+            </div>
+        </div>
+
+        <!-- Preset Filters Tab -->
+        <div class="tab-content" id="filters-tab">
+            <div class="chips" style="flex-wrap: wrap; gap: 10px;">
+                <button class="chip" onclick="applyPreset('cinematic')">🎬 Cinematic Film</button>
+                <button class="chip" onclick="applyPreset('warm')">☀️ Summer Gold</button>
+                <button class="chip" onclick="applyPreset('cool')">❄️ Cyber Cool</button>
+                <button class="chip" onclick="applyPreset('bw')">🔳 Monochrome</button>
+                <button class="chip" onclick="applyPreset('contrast')">⚡ High Dynamic</button>
+                <button class="chip" onclick="applyPreset('sepia')">📜 Vintage Sepia</button>
+                <button class="chip" onclick="applyPreset('invert')">🔄 Invert Colors</button>
+                <button class="chip" onclick="applyPreset('reset')">🔄 Reset Filters</button>
+            </div>
+        </div>
+
+        <!-- Manual Adjustments Tab -->
+        <div class="tab-content" id="adjust-tab">
+            <div class="slider-group">
+                <div class="slider-header"><span>Brightness</span><span id="val-bright">100%</span></div>
+                <input type="range" id="slider-bright" min="50" max="150" value="100" oninput="updateSliders()">
+            </div>
+            <div class="slider-group">
+                <div class="slider-header"><span>Contrast</span><span id="val-contrast">100%</span></div>
+                <input type="range" id="slider-contrast" min="50" max="150" value="100" oninput="updateSliders()">
+            </div>
+            <div class="slider-group">
+                <div class="slider-header"><span>Saturation</span><span id="val-sat">100%</span></div>
+                <input type="range" id="slider-sat" min="0" max="200" value="100" oninput="updateSliders()">
+            </div>
+        </div>
+
+        <!-- Text Overlay / Sticker Tool Tab -->
+        <div class="tab-content" id="text-tab">
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <input type="text" id="overlay-text-input" placeholder="Enter title or thumbnail text..." value="EPIC VLOG">
+                <input type="color" id="overlay-color" value="#ffffff" style="width: 40px; height: 36px; padding: 2px;">
+                <button class="btn-sm btn-accent" onclick="addTextOverlay()">Add Text</button>
+            </div>
+            <div class="chips">
+                <button class="chip" onclick="setOverlayPreset('YOUTUBE THUMBNAIL')">📹 YouTube Banner</button>
+                <button class="chip" onclick="setOverlayPreset('OPTIMA EDIT')">✨ Watermark Tag</button>
+            </div>
         </div>
 
         <div class="input-bar">
             <input type="file" id="file-input" accept="image/*,video/*" style="display:none;" onchange="loadFile(event)">
             <button class="btn-plus" onclick="document.getElementById('file-input').click()" title="Add Media">+</button>
-            <input type="text" id="text-input" placeholder="Type instruction or prompt..." onkeydown="if(event.key==='Enter') send()">
+            <input type="text" id="text-input" placeholder="Ask AI to edit photo..." onkeydown="if(event.key==='Enter') send()">
             <button class="btn-send" onclick="send()">➔</button>
         </div>
-        <div class="domain-footer">Powered by Optima AI — optima-ai.vercel.app</div>
+        <div class="domain-footer">Powered by Optima AI Studio — optima-ai.vercel.app</div>
     </div>
 
     <!-- Settings Modal -->
     <div class="modal" id="settings-modal">
         <div class="modal-card">
-            <h3>⚙️ Optima AI Settings</h3>
+            <h3>⚙️ Optima AI Studio Settings</h3>
             <div>
-                <label>Gemini API Key (Optional for AI generation)</label>
-                <input type="password" id="api-key-input" placeholder="AIzaSy..." value="">
+                <label>Gemini API Key (Optional)</label>
+                <input type="password" id="api-key-input" placeholder="AIzaSy..." value="" style="width:100%; padding:8px; background:#1c1c28; border:1px solid #333; color:#fff; border-radius:8px; margin-top:4px;">
             </div>
-            <button class="btn-sm btn-accent" style="justify-content: center; padding: 10px;" onclick="saveSettings()">Save & Close</button>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <label>Watermark Enabled</label>
+                <input type="checkbox" id="watermark-toggle" checked style="accent-color:#a855f7;">
+            </div>
+            <button class="btn-sm btn-accent" style="justify-content: center; padding: 10px; margin-top:8px;" onclick="saveSettings()">Save & Close</button>
         </div>
     </div>
 
     <script>
         let originalImg = null;
         let isVid = false;
+        let currentTextOverlay = "";
+        let currentTextColor = "#ffffff";
 
         document.addEventListener('DOMContentLoaded', () => {
             const savedKey = localStorage.getItem('optima_gemini_key') || '';
             document.getElementById('api-key-input').value = savedKey;
         });
 
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            event.currentTarget.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
         function toggleSettings() {
-            const m = document.getElementById('settings-modal');
-            m.classList.toggle('active');
+            document.getElementById('settings-modal').classList.toggle('active');
         }
 
         function saveSettings() {
             const k = document.getElementById('api-key-input').value.trim();
             localStorage.setItem('optima_gemini_key', k);
             toggleSettings();
-            addMsg('ai', k ? "Gemini API key saved successfully!" : "Settings saved.");
+            addMsg('ai', "Settings saved successfully!");
+            renderCanvas();
         }
 
         function loadFile(e) {
@@ -152,18 +237,14 @@
 
             reader.onload = function(evt) {
                 document.getElementById('welcome').style.display = 'none';
+                document.getElementById('canvas-wrapper').style.display = 'flex';
                 
                 if (!isVid) {
-                    const canvas = document.getElementById('canvas');
-                    const ctx = canvas.getContext('2d');
                     const img = new Image();
                     img.onload = function() {
                         originalImg = img;
-                        canvas.width = img.width;
-                        canvas.height = img.height;
-                        ctx.drawImage(img, 0, 0);
-                        drawWatermark(ctx, canvas.width, canvas.height);
-                        canvas.style.display = 'block';
+                        renderCanvas();
+                        document.getElementById('canvas').style.display = 'block';
                         document.getElementById('video').style.display = 'none';
                     };
                     img.src = evt.target.result;
@@ -175,75 +256,26 @@
                 }
 
                 addMsg('user', `Attached: ${file.name}`);
-                addMsg('ai', "Media loaded! Tap a filter above to transform it.");
+                addMsg('ai', "Media loaded into Optima Studio! Use the tabs above for manual adjustments or AI filters.");
             };
             reader.readAsDataURL(file);
         }
 
-        function drawWatermark(ctx, w, h) {
-            const fontSize = Math.max(16, Math.floor(w * 0.035));
-            ctx.font = `800 ${fontSize}px sans-serif`;
-            ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
-            ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
-            ctx.shadowBlur = 6;
-            ctx.textAlign = "right";
-            ctx.fillText("✨ Optima AI", w - (fontSize * 0.8), h - (fontSize * 0.8));
-            ctx.shadowBlur = 0; // Reset
-        }
-
-        function send() {
-            const input = document.getElementById('text-input');
-            const val = input.value.trim();
-            if (!val) return;
-
-            addMsg('user', val);
-            input.value = '';
-
-            setTimeout(async () => {
-                const apiKey = localStorage.getItem('optima_gemini_key');
-                const lower = val.toLowerCase();
-
-                if (apiKey) {
-                    addMsg('ai', "Thinking with Gemini AI...");
-                    try {
-                        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ contents: [{ parts: [{ text: val }] }] })
-                        });
-                        const data = await res.json();
-                        if (data.candidates && data.candidates[0].content.parts[0].text) {
-                            addMsg('ai', data.candidates[0].content.parts[0].text);
-                            return;
-                        }
-                    } catch (err) {
-                        console.error(err);
-                    }
-                }
-
-                if (lower.includes('cinematic')) applyPreset('cinematic');
-                else if (lower.includes('warm')) applyPreset('warm');
-                else if (lower.includes('cool')) applyPreset('cool');
-                else if (lower.includes('black') || lower.includes('bw')) applyPreset('bw');
-                else addMsg('ai', `Applied instruction: "${val}"`);
-            }, 400);
-        }
-
-        function applyPreset(type) {
-            if (!originalImg) {
-                addMsg('ai', "Please tap '+' to select a photo first!");
-                return;
-            }
+        function renderCanvas(presetFilter = null) {
+            if (!originalImg) return;
 
             const canvas = document.getElementById('canvas');
             const ctx = canvas.getContext('2d');
+
+            canvas.width = originalImg.width;
+            canvas.height = originalImg.height;
+
             ctx.drawImage(originalImg, 0, 0);
 
-            if (type === 'reset') {
-                drawWatermark(ctx, canvas.width, canvas.height);
-                addMsg('ai', "Reset image to original.");
-                return;
-            }
+            // Read sliders
+            const bright = document.getElementById('slider-bright').value / 100;
+            const contrast = document.getElementById('slider-contrast').value / 100;
+            const sat = document.getElementById('slider-sat').value / 100;
 
             const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const d = imgData.data;
@@ -251,56 +283,78 @@
             for (let i = 0; i < d.length; i += 4) {
                 let r = d[i], g = d[i+1], b = d[i+2];
 
-                if (type === 'cinematic') {
-                    d[i] = Math.min(255, r * 1.2);
-                    d[i+1] = g * 0.95;
-                    d[i+2] = Math.min(255, b * 1.15);
-                } else if (type === 'warm') {
-                    d[i] = Math.min(255, r * 1.25);
-                    d[i+1] = Math.min(255, g * 1.05);
-                    d[i+2] = b * 0.85;
-                } else if (type === 'cool') {
-                    d[i] = r * 0.85;
-                    d[i+1] = Math.min(255, g * 1.05);
-                    d[i+2] = Math.min(255, b * 1.25);
-                } else if (type === 'bw') {
-                    let avg = (r + g + b) / 3;
-                    d[i] = d[i+1] = d[i+2] = avg;
-                } else if (type === 'contrast') {
-                    d[i] = r > 128 ? Math.min(255, r * 1.2) : r * 0.8;
-                    d[i+1] = g > 128 ? Math.min(255, g * 1.2) : g * 0.8;
-                    d[i+2] = b > 128 ? Math.min(255, b * 1.2) : b * 0.8;
-                } else if (type === 'sepia') {
-                    d[i] = (r * .393) + (g *.769) + (b * .189);
-                    d[i+1] = (r * .349) + (g *.686) + (b * .168);
-                    d[i+2] = (r * .272) + (g *.534) + (b * .131);
+                // Brightness & Contrast
+                r = (r - 128) * contrast + 128 * bright;
+                g = (g - 128) * contrast + 128 * bright;
+                b = (b - 128) * contrast + 128 * bright;
+
+                // Saturation
+                let gray = 0.2989 * r + 0.5870 * g + 0.1140 * b;
+                r = gray + sat * (r - gray);
+                g = gray + sat * (g - gray);
+                b = gray + sat * (b - gray);
+
+                // Presets
+                if (presetFilter === 'cinematic') { r *= 1.2; g *= 0.95; b *= 1.15; }
+                else if (presetFilter === 'warm') { r *= 1.25; g *= 1.05; b *= 0.85; }
+                else if (presetFilter === 'cool') { r *= 0.85; g *= 1.05; b *= 1.25; }
+                else if (presetFilter === 'bw') { r = g = b = gray; }
+                else if (presetFilter === 'sepia') {
+                    r = (r * .393) + (g *.769) + (b * .189);
+                    g = (r * .349) + (g *.686) + (b * .168);
+                    b = (r * .272) + (g *.534) + (b * .131);
+                } else if (presetFilter === 'invert') {
+                    r = 255 - r; g = 255 - g; b = 255 - b;
                 }
+
+                d[i] = Math.min(255, Math.max(0, r));
+                d[i+1] = Math.min(255, Math.max(0, g));
+                d[i+2] = Math.min(255, Math.max(0, b));
             }
+
             ctx.putImageData(imgData, 0, 0);
-            drawWatermark(ctx, canvas.width, canvas.height);
-            addMsg('ai', `Applied ${type} style with Optima AI watermark!`);
+
+            // Draw Text Overlay if present
+            if (currentTextOverlay) {
+                const fontSize = Math.max(24, Math.floor(canvas.width * 0.06));
+                ctx.font = `900 ${fontSize}px sans-serif`;
+                ctx.fillStyle = currentTextColor;
+                ctx.shadowColor = "rgba(0,0,0,0.9)";
+                ctx.shadowBlur = 10;
+                ctx.textAlign = "center";
+                ctx.fillText(currentTextOverlay, canvas.width / 2, canvas.height * 0.25);
+                ctx.shadowBlur = 0;
+            }
+
+            // Draw Watermark
+            if (document.getElementById('watermark-toggle').checked) {
+                const wmSize = Math.max(14, Math.floor(canvas.width * 0.03));
+                ctx.font = `700 ${wmSize}px sans-serif`;
+                ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+                ctx.textAlign = "right";
+                ctx.fillText("✨ Optima AI Studio", canvas.width - (wmSize * 0.8), canvas.height - (wmSize * 0.8));
+            }
         }
 
-        function downloadImage() {
-            const canvas = document.getElementById('canvas');
+        function updateSliders() {
+            document.getElementById('val-bright').innerText = document.getElementById('slider-bright').value + '%';
+            document.getElementById('val-contrast').innerText = document.getElementById('slider-contrast').value + '%';
+            document.getElementById('val-sat').innerText = document.getElementById('slider-sat').value + '%';
+            renderCanvas();
+        }
+
+        function applyPreset(type) {
             if (!originalImg) {
-                addMsg('ai', "No edited image available to download.");
+                addMsg('ai', "Please tap '+' to upload a photo first!");
                 return;
             }
-            const link = document.createElement('a');
-            link.download = 'optima-ai-watermarked.png';
-            link.href = canvas.toDataURL();
-            link.click();
-        }
-
-        function addMsg(sender, txt) {
-            const box = document.getElementById('messages');
-            const d = document.createElement('div');
-            d.className = `msg ${sender}`;
-            d.innerHTML = txt;
-            box.appendChild(d);
-            box.scrollTop = box.scrollHeight;
-        }
-    </script>
-</body>
-</html>
+            if (type === 'reset') {
+                document.getElementById('slider-bright').value = 100;
+                document.getElementById('slider-contrast').value = 100;
+                document.getElementById('slider-sat').value = 100;
+                currentTextOverlay = "";
+                updateSliders();
+                addMsg('ai', "Reset all adjustments.");
+                return;
+            }
+            renderCanvas(type
