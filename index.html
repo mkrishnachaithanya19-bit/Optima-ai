@@ -3,40 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Optima AI</title>
+    <title>Optima AI — Upgraded</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
         body { background: #0a0a0c; color: #fff; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        header { padding: 14px 16px; background: #13131a; border-bottom: 1px solid #222; text-align: center; font-weight: bold; font-size: 1.1rem; color: #a855f7; display: flex; align-items: center; justify-content: space-between; }
-        .stage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px; position: relative; overflow: hidden; }
-        .welcome { text-align: center; }
-        .btn-upload-lg { background: linear-gradient(135deg, #6366f1, #a855f7); color: #fff; border: none; padding: 12px 24px; border-radius: 24px; font-weight: bold; font-size: 0.95rem; margin-top: 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
-        canvas, video { max-width: 100%; max-height: 240px; border-radius: 12px; display: none; object-fit: contain; }
-        .chat-box { height: 320px; background: #13131a; border-top: 1px solid #222; display: flex; flex-direction: column; }
+        
+        header { padding: 12px 16px; background: #13131a; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: space-between; }
+        .brand { font-weight: bold; font-size: 1.1rem; color: #a855f7; display: flex; align-items: center; gap: 6px; }
+        .header-btns { display: flex; gap: 8px; }
+        
+        .btn-sm { background: #1c1c28; border: 1px solid #333; color: #fff; padding: 6px 12px; border-radius: 16px; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+        .btn-accent { background: linear-gradient(135deg, #6366f1, #a855f7); border: none; }
+
+        .stage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px; position: relative; overflow: hidden; background: #070709; }
+        .welcome { text-align: center; max-width: 320px; }
+        .btn-upload-lg { background: linear-gradient(135deg, #6366f1, #a855f7); color: #fff; border: none; padding: 12px 24px; border-radius: 24px; font-weight: bold; font-size: 0.95rem; margin-top: 14px; cursor: pointer; }
+        
+        canvas, video { max-width: 100%; max-height: 230px; border-radius: 12px; display: none; object-fit: contain; box-shadow: 0 8px 24px rgba(0,0,0,0.6); }
+        
+        .chat-box { height: 340px; background: #13131a; border-top: 1px solid #222; display: flex; flex-direction: column; }
         .messages { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
-        .msg { padding: 10px 14px; border-radius: 12px; font-size: 0.88rem; max-width: 85%; word-break: break-word; }
+        .msg { padding: 10px 14px; border-radius: 12px; font-size: 0.88rem; max-width: 85%; word-break: break-word; line-height: 1.4; }
         .msg.ai { background: #1c1c28; align-self: flex-start; border: 1px solid #2a2a3c; }
         .msg.user { background: linear-gradient(135deg, #6366f1, #a855f7); align-self: flex-end; }
+        
         .chips { display: flex; gap: 8px; overflow-x: auto; padding: 8px 12px; background: #0a0a0c; scrollbar-width: none; }
         .chips::-webkit-scrollbar { display: none; }
         .chip { background: #1c1c28; border: 1px solid #333; color: #fff; padding: 6px 12px; border-radius: 16px; font-size: 0.78rem; white-space: nowrap; cursor: pointer; }
+        
         .input-bar { padding: 10px; display: flex; gap: 8px; background: #13131a; align-items: center; }
         input[type="text"] { flex: 1; background: #1c1c28; border: 1px solid #333; color: #fff; padding: 10px 14px; border-radius: 20px; outline: none; font-size: 0.9rem; }
-        .btn-plus { background: #1c1c28; border: 1px solid #333; color: #a855f7; width: 40px; height: 40px; border-radius: 50%; font-size: 1.5rem; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+        .btn-plus { background: #1c1c28; border: 1px solid #333; color: #a855f7; width: 40px; height: 40px; border-radius: 50%; font-size: 1.4rem; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
         .btn-send { background: linear-gradient(135deg, #6366f1, #a855f7); border: none; color: #fff; width: 40px; height: 40px; border-radius: 50%; font-weight: bold; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+
+        /* Modal Settings */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
+        .modal.active { display: flex; }
+        .modal-card { background: #13131a; border: 1px solid #333; border-radius: 16px; width: 100%; max-width: 400px; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+        .modal-card h3 { font-size: 1.1rem; color: #a855f7; }
+        .modal-card label { font-size: 0.8rem; color: #aaa; }
+        .modal-card input { background: #1c1c28; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 8px; outline: none; width: 100%; font-size: 0.85rem; }
     </style>
 </head>
 <body>
+
     <header>
-        <span>✨ Optima AI</span>
-        <button class="chip" onclick="document.getElementById('file-input').click()">+ Add Media</button>
+        <div class="brand">✨ Optima AI</div>
+        <div class="header-btns">
+            <button class="btn-sm" onclick="downloadImage()">💾 Download</button>
+            <button class="btn-sm" onclick="toggleSettings()">⚙️ Settings</button>
+        </div>
     </header>
     
     <div class="stage">
         <div class="welcome" id="welcome">
             <h2>What would you like to edit?</h2>
-            <p style="color:#888; font-size:0.85rem; margin-top:6px;">Upload a photo or video to start.</p>
-            <button class="btn-upload-lg" onclick="document.getElementById('file-input').click()">+ Select Photo/Video</button>
+            <p style="color:#888; font-size:0.85rem; margin-top:6px;">Upload a photo or video to begin.</p>
+            <button class="btn-upload-lg" onclick="document.getElementById('file-input').click()">+ Select Media</button>
         </div>
         <canvas id="canvas"></canvas>
         <video id="video" controls></video>
@@ -44,36 +67,66 @@
 
     <div class="chat-box">
         <div class="messages" id="messages">
-            <div class="msg ai">Hello! Tap the <strong>+</strong> button below or top right to add a photo or video.</div>
+            <div class="msg ai">Hello! Tap <strong>+</strong> to attach a photo or video. Try the filters below!</div>
         </div>
 
         <div class="chips">
-            <button class="chip" onclick="quickEdit('Make cinematic')">🎬 Cinematic</button>
-            <button class="chip" onclick="quickEdit('Warm filter')">☀️ Warm</button>
-            <button class="chip" onclick="quickEdit('Cool filter')">❄️ Cool</button>
-            <button class="chip" onclick="quickEdit('Enhance quality')">✨ Enhance</button>
+            <button class="chip" onclick="applyPreset('cinematic')">🎬 Cinematic</button>
+            <button class="chip" onclick="applyPreset('warm')">☀️ Warm</button>
+            <button class="chip" onclick="applyPreset('cool')">❄️ Cool</button>
+            <button class="chip" onclick="applyPreset('bw')">🔳 B&W</button>
+            <button class="chip" onclick="applyPreset('contrast')">⚡ High Contrast</button>
+            <button class="chip" onclick="applyPreset('sepia')">📜 Sepia</button>
+            <button class="chip" onclick="applyPreset('reset')">🔄 Reset</button>
         </div>
 
         <div class="input-bar">
-            <!-- File Input hidden trigger -->
             <input type="file" id="file-input" accept="image/*,video/*" style="display:none;" onchange="loadFile(event)">
-            
-            <!-- Plus (+) Button for adding photos/videos -->
-            <button class="btn-plus" onclick="document.getElementById('file-input').click()" title="Add Photo or Video">+</button>
-            
-            <input type="text" id="text-input" placeholder="Type instruction..." onkeydown="if(event.key==='Enter') send()">
+            <button class="btn-plus" onclick="document.getElementById('file-input').click()" title="Add Media">+</button>
+            <input type="text" id="text-input" placeholder="Type instruction or prompt..." onkeydown="if(event.key==='Enter') send()">
             <button class="btn-send" onclick="send()">➔</button>
         </div>
     </div>
 
+    <!-- Settings Modal -->
+    <div class="modal" id="settings-modal">
+        <div class="modal-card">
+            <h3>⚙️ Optima AI Settings</h3>
+            <div>
+                <label>Gemini API Key (Optional for AI generation)</label>
+                <input type="password" id="api-key-input" placeholder="AIzaSy..." value="">
+            </div>
+            <button class="btn-sm btn-accent" style="justify-content: center; padding: 10px;" onclick="saveSettings()">Save & Close</button>
+        </div>
+    </div>
+
     <script>
-        let imgObj = null;
+        let originalImg = null;
+        let isVid = false;
+
+        // Load saved API key on startup
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedKey = localStorage.getItem('optima_gemini_key') || '';
+            document.getElementById('api-key-input').value = savedKey;
+        });
+
+        function toggleSettings() {
+            const m = document.getElementById('settings-modal');
+            m.classList.toggle('active');
+        }
+
+        function saveSettings() {
+            const k = document.getElementById('api-key-input').value.trim();
+            localStorage.setItem('optima_gemini_key', k);
+            toggleSettings();
+            addMsg('ai', k ? "Gemini API key saved successfully!" : "Settings saved.");
+        }
 
         function loadFile(e) {
             const file = e.target.files[0];
             if (!file) return;
 
-            const isVid = file.type.startsWith('video');
+            isVid = file.type.startsWith('video');
             const reader = new FileReader();
 
             reader.onload = function(evt) {
@@ -84,7 +137,7 @@
                     const ctx = canvas.getContext('2d');
                     const img = new Image();
                     img.onload = function() {
-                        imgObj = img;
+                        originalImg = img;
                         canvas.width = img.width;
                         canvas.height = img.height;
                         ctx.drawImage(img, 0, 0);
@@ -100,14 +153,9 @@
                 }
 
                 addMsg('user', `Attached: ${file.name}`);
-                addMsg('ai', "Media loaded! Tap a filter below or type what you'd like to edit.");
+                addMsg('ai', "Media loaded! Tap a filter above or type an instruction.");
             };
             reader.readAsDataURL(file);
-        }
-
-        function quickEdit(prompt) {
-            document.getElementById('text-input').value = prompt;
-            send();
         }
 
         function send() {
@@ -118,40 +166,97 @@
             addMsg('user', val);
             input.value = '';
 
-            setTimeout(() => {
-                if (!imgObj) {
-                    addMsg('ai', "Please tap the '+' button to select a photo or video first!");
-                    return;
-                }
+            setTimeout(async () => {
+                const apiKey = localStorage.getItem('optima_gemini_key');
                 const lower = val.toLowerCase();
-                if (lower.includes('cinematic')) {
-                    applyFilter(1.2, 0.9, 1.1);
-                    addMsg('ai', "Applied cinematic filter!");
-                } else if (lower.includes('warm')) {
-                    applyFilter(1.3, 1.1, 0.8);
-                    addMsg('ai', "Applied warm style!");
-                } else if (lower.includes('cool')) {
-                    applyFilter(0.8, 1.0, 1.3);
-                    addMsg('ai', "Applied cool style!");
-                } else {
-                    applyFilter(1.1, 1.1, 1.1);
-                    addMsg('ai', `Applied edit: "${val}".`);
+
+                if (apiKey) {
+                    addMsg('ai', "Thinking with Gemini AI...");
+                    try {
+                        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ contents: [{ parts: [{ text: val }] }] })
+                        });
+                        const data = await res.json();
+                        if (data.candidates && data.candidates[0].content.parts[0].text) {
+                            addMsg('ai', data.candidates[0].content.parts[0].text);
+                            return;
+                        }
+                    } catch (err) {
+                        console.error(err);
+                    }
                 }
+
+                // Fallback / Preset filters
+                if (lower.includes('cinematic')) applyPreset('cinematic');
+                else if (lower.includes('warm')) applyPreset('warm');
+                else if (lower.includes('cool')) applyPreset('cool');
+                else if (lower.includes('black') || lower.includes('bw')) applyPreset('bw');
+                else addMsg('ai', `Applied instruction: "${val}"`);
             }, 400);
         }
 
-        function applyFilter(rM, gM, bM) {
+        function applyPreset(type) {
+            if (!originalImg) {
+                addMsg('ai', "Please tap '+' to select a photo first!");
+                return;
+            }
+
             const canvas = document.getElementById('canvas');
             const ctx = canvas.getContext('2d');
-            ctx.drawImage(imgObj, 0, 0);
+            ctx.drawImage(originalImg, 0, 0);
+
+            if (type === 'reset') {
+                addMsg('ai', "Reset image to original.");
+                return;
+            }
+
             const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const d = imgData.data;
+
             for (let i = 0; i < d.length; i += 4) {
-                d[i] = Math.min(255, d[i] * rM);
-                d[i+1] = Math.min(255, d[i+1] * gM);
-                d[i+2] = Math.min(255, d[i+2] * bM);
+                let r = d[i], g = d[i+1], b = d[i+2];
+
+                if (type === 'cinematic') {
+                    d[i] = Math.min(255, r * 1.2);
+                    d[i+1] = g * 0.95;
+                    d[i+2] = Math.min(255, b * 1.15);
+                } else if (type === 'warm') {
+                    d[i] = Math.min(255, r * 1.25);
+                    d[i+1] = Math.min(255, g * 1.05);
+                    d[i+2] = b * 0.85;
+                } else if (type === 'cool') {
+                    d[i] = r * 0.85;
+                    d[i+1] = Math.min(255, g * 1.05);
+                    d[i+2] = Math.min(255, b * 1.25);
+                } else if (type === 'bw') {
+                    let avg = (r + g + b) / 3;
+                    d[i] = d[i+1] = d[i+2] = avg;
+                } else if (type === 'contrast') {
+                    d[i] = r > 128 ? Math.min(255, r * 1.2) : r * 0.8;
+                    d[i+1] = g > 128 ? Math.min(255, g * 1.2) : g * 0.8;
+                    d[i+2] = b > 128 ? Math.min(255, b * 1.2) : b * 0.8;
+                } else if (type === 'sepia') {
+                    d[i] = (r * .393) + (g *.769) + (b * .189);
+                    d[i+1] = (r * .349) + (g *.686) + (b * .168);
+                    d[i+2] = (r * .272) + (g *.534) + (b * .131);
+                }
             }
             ctx.putImageData(imgData, 0, 0);
+            addMsg('ai', `Applied ${type} style!`);
+        }
+
+        function downloadImage() {
+            const canvas = document.getElementById('canvas');
+            if (!originalImg) {
+                addMsg('ai', "No edited image available to download.");
+                return;
+            }
+            const link = document.createElement('a');
+            link.download = 'optima-ai-edit.png';
+            link.href = canvas.toDataURL();
+            link.click();
         }
 
         function addMsg(sender, txt) {
@@ -165,3 +270,5 @@
     </script>
 </body>
 </html>
+
+                    
