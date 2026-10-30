@@ -4,36 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#13131a">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Optima AI Studio</title>
     
-    <!-- PWA Web App Manifest directly embedded -->
     <link rel="manifest" href='data:application/manifest+json,{"name":"Optima AI Studio","short_name":"Optima AI","start_url":"/","display":"standalone","background_color":"#0a0a0c","theme_color":"#13131a"}'>
 
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
         body { background: #0a0a0c; color: #fff; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        
         header { padding: 10px 16px; background: #13131a; border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: space-between; }
         .brand { font-weight: 800; font-size: 1.1rem; color: #fff; display: flex; align-items: center; gap: 8px; }
         .brand-text { background: linear-gradient(135deg, #6366f1, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .btn-sm { background: #6366f1; border: none; color: #fff; padding: 6px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; cursor: pointer; }
+        .header-btns { display: flex; gap: 6px; }
+        .btn-sm { background: #1c1c28; border: 1px solid #333; color: #fff; padding: 6px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; cursor: pointer; }
+        .btn-accent { background: linear-gradient(135deg, #6366f1, #a855f7); border: none; }
+
         .stage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px; position: relative; overflow: hidden; background: #070709; }
         canvas { max-width: 100%; max-height: 240px; border-radius: 12px; display: none; box-shadow: 0 8px 24px rgba(0,0,0,0.6); }
-        .studio-panel { height: 340px; background: #13131a; border-top: 1px solid #222; display: flex; flex-direction: column; }
+
+        .studio-panel { height: 350px; background: #13131a; border-top: 1px solid #222; display: flex; flex-direction: column; }
         .tab-bar { display: flex; background: #0a0a0c; border-bottom: 1px solid #222; }
         .tab-btn { flex: 1; padding: 10px; background: transparent; border: none; color: #888; font-size: 0.8rem; font-weight: bold; cursor: pointer; }
         .tab-btn.active { color: #a855f7; border-bottom: 2px solid #a855f7; background: #13131a; }
+
         .tab-content { flex: 1; overflow-y: auto; padding: 12px; display: none; flex-direction: column; gap: 10px; }
         .tab-content.active { display: flex; }
-        .messages { display: flex; flex-direction: column; gap: 8px; }
-        .msg { padding: 8px 12px; border-radius: 12px; font-size: 0.85rem; max-width: 85%; }
-        .msg.ai { background: #1c1c28; align-self: flex-start; }
-        .msg.user { background: #6366f1; align-self: flex-end; }
+
+        .messages { display: flex; flex-direction: column; gap: 8px; flex: 1; overflow-y: auto; }
+        .msg { padding: 8px 12px; border-radius: 12px; font-size: 0.85rem; max-width: 88%; word-break: break-word; line-height: 1.3; }
+        .msg.ai { background: #1c1c28; align-self: flex-start; border: 1px solid #2a2a3c; }
+        .msg.user { background: linear-gradient(135deg, #6366f1, #a855f7); align-self: flex-end; }
+
+        .chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; }
+        .chip { background: #1c1c28; border: 1px solid #333; color: #fff; padding: 6px 12px; border-radius: 16px; font-size: 0.78rem; white-space: nowrap; cursor: pointer; flex-shrink: 0; }
+
         .input-bar { padding: 8px 12px; display: flex; gap: 8px; background: #13131a; border-top: 1px solid #222; align-items: center; }
-        input[type="text"] { flex: 1; background: #1c1c28; border: 1px solid #333; color: #fff; padding: 8px 12px; border-radius: 18px; outline: none; }
-        .btn-plus { background: #1c1c28; border: 1px solid #333; color: #a855f7; width: 36px; height: 36px; border-radius: 50%; font-size: 1.3rem; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .btn-send { background: #6366f1; border: none; color: #fff; width: 36px; height: 36px; border-radius: 50%; font-size: 1rem; cursor: pointer; }
+        input[type="text"] { flex: 1; background: #1c1c28; border: 1px solid #333; color: #fff; padding: 8px 12px; border-radius: 18px; outline: none; font-size: 0.85rem; }
+        .btn-plus { background: #1c1c28; border: 1px solid #333; color: #a855f7; width: 36px; height: 36px; border-radius: 50%; font-size: 1.3rem; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+        .btn-send { background: linear-gradient(135deg, #6366f1, #a855f7); border: none; color: #fff; width: 36px; height: 36px; border-radius: 50%; font-size: 1rem; cursor: pointer; flex-shrink: 0; }
+
+        /* Modal Settings */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
+        .modal.active { display: flex; }
+        .modal-card { background: #13131a; border: 1px solid #333; border-radius: 16px; width: 100%; max-width: 400px; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
     </style>
 </head>
 <body>
@@ -48,7 +61,10 @@
             </svg>
             <span class="brand-text">Optima AI Studio</span>
         </div>
-        <button class="btn-sm" onclick="downloadImage()">💾 Save</button>
+        <div class="header-btns">
+            <button class="btn-sm btn-accent" onclick="downloadImage()">💾 Save</button>
+            <button class="btn-sm" onclick="toggleSettings()">⚙️ Key</button>
+        </div>
     </header>
 
     <div class="stage">
@@ -61,41 +77,78 @@
 
     <div class="studio-panel">
         <div class="tab-bar">
-            <button class="tab-btn active" onclick="switchTab('ai-tab')">AI Assistant</button>
-            <button class="tab-btn" onclick="switchTab('adjust-tab')">Adjustments</button>
+            <button class="tab-btn active" onclick="switchTab('ai-tab')">✨ AI Assistant</button>
+            <button class="tab-btn" onclick="switchTab('adjust-tab')">🎛 Adjustments</button>
         </div>
 
         <div class="tab-content active" id="ai-tab">
             <div class="messages" id="messages">
-                <div class="msg ai">Hello! Upload a photo and tap filters or type prompts to edit.</div>
+                <div class="msg ai">Hello! Tap <strong>⚙️ Key</strong> in the header to enter your Gemini API key so I can process your prompts.</div>
+            </div>
+            <div class="chips">
+                <button class="chip" onclick="applyPreset('cinematic')">🎬 Cinematic</button>
+                <button class="chip" onclick="applyPreset('warm')">☀️ Warm</button>
+                <button class="chip" onclick="applyPreset('cool')">❄️ Cool</button>
+                <button class="chip" onclick="applyPreset('bw')">🔳 B&W</button>
             </div>
         </div>
 
         <div class="tab-content" id="adjust-tab">
             <label style="font-size:0.8rem;">Brightness
-                <input type="range" id="slider-bright" min="50" max="150" value="100" oninput="renderCanvas()" style="width:100%;">
+                <input type="range" id="slider-bright" min="50" max="150" value="100" oninput="renderCanvas()" style="width:100%; accent-color:#a855f7;">
             </label>
             <label style="font-size:0.8rem;">Contrast
-                <input type="range" id="slider-contrast" min="50" max="150" value="100" oninput="renderCanvas()" style="width:100%;">
+                <input type="range" id="slider-contrast" min="50" max="150" value="100" oninput="renderCanvas()" style="width:100%; accent-color:#a855f7;">
             </label>
         </div>
 
         <div class="input-bar">
             <input type="file" id="file-input" accept="image/*" style="display:none;" onchange="loadFile(event)">
             <button class="btn-plus" onclick="document.getElementById('file-input').click()">+</button>
-            <input type="text" id="text-input" placeholder="Type prompt..." onkeydown="if(event.key==='Enter') send()">
+            <input type="text" id="text-input" placeholder="Ask AI to edit image..." onkeydown="if(event.key==='Enter') send()">
             <button class="btn-send" onclick="send()">➔</button>
+        </div>
+    </div>
+
+    <!-- API Key Settings Modal -->
+    <div class="modal" id="settings-modal">
+        <div class="modal-card">
+            <h3 style="color:#a855f7;">⚙️ Gemini API Key</h3>
+            <p style="font-size:0.8rem; color:#aaa;">Paste your AI key starting with <code>AIzaSy...</code></p>
+            <input type="password" id="api-key-input" placeholder="AIzaSy..." style="background:#1c1c28; border:1px solid #333; color:#fff; padding:10px; border-radius:8px; outline:none; width:100%;">
+            <button class="btn-sm btn-accent" style="padding:10px; font-weight:bold;" onclick="saveSettings()">Save & Activate AI</button>
         </div>
     </div>
 
     <script>
         let originalImg = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedKey = localStorage.getItem('optima_gemini_key') || '';
+            document.getElementById('api-key-input').value = savedKey;
+            if (savedKey) {
+                addMsg('ai', "Gemini AI connected and ready!");
+            }
+        });
+
+        function toggleSettings() {
+            document.getElementById('settings-modal').classList.toggle('active');
+        }
+
+        function saveSettings() {
+            const k = document.getElementById('api-key-input').value.trim();
+            localStorage.setItem('optima_gemini_key', k);
+            toggleSettings();
+            addMsg('ai', k ? "Gemini API key saved successfully!" : "Key removed.");
+        }
+
         function switchTab(tabId) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             event.currentTarget.classList.add('active');
             document.getElementById(tabId).classList.add('active');
         }
+
         function loadFile(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -110,10 +163,13 @@
                     canvas.style.display = 'block';
                 };
                 img.src = evt.target.result;
+                addMsg('user', `Attached: ${file.name}`);
+                addMsg('ai', "Image loaded! Type an AI instruction below or apply filters.");
             };
             reader.readAsDataURL(file);
         }
-        function renderCanvas() {
+
+        function renderCanvas(preset) {
             if (!originalImg) return;
             const canvas = document.getElementById('canvas');
             const ctx = canvas.getContext('2d');
@@ -126,20 +182,84 @@
 
             const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const d = imgData.data;
+
             for (let i = 0; i < d.length; i += 4) {
-                d[i] = Math.min(255, Math.max(0, (d[i] - 128) * c + 128 * b));
-                d[i+1] = Math.min(255, Math.max(0, (d[i+1] - 128) * c + 128 * b));
-                d[i+2] = Math.min(255, Math.max(0, (d[i+2] - 128) * c + 128 * b));
+                let r = d[i], g = d[i+1], bVal = d[i+2];
+
+                r = (r - 128) * c + 128 * b;
+                g = (g - 128) * c + 128 * b;
+                bVal = (bVal - 128) * c + 128 * b;
+
+                if (preset === 'cinematic') { r *= 1.2; g *= 0.95; bVal *= 1.15; }
+                else if (preset === 'warm') { r *= 1.25; g *= 1.05; bVal *= 0.85; }
+                else if (preset === 'cool') { r *= 0.85; g *= 1.05; bVal *= 1.25; }
+                else if (preset === 'bw') {
+                    let avg = (r + g + bVal) / 3;
+                    r = g = bVal = avg;
+                }
+
+                d[i] = Math.min(255, Math.max(0, r));
+                d[i+1] = Math.min(255, Math.max(0, g));
+                d[i+2] = Math.min(255, Math.max(0, bVal));
             }
             ctx.putImageData(imgData, 0, 0);
 
-            // Watermark
             const wmSize = Math.max(14, Math.floor(canvas.width * 0.035));
             ctx.font = `700 ${wmSize}px sans-serif`;
             ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
             ctx.textAlign = "right";
             ctx.fillText("✨ Optima AI Studio", canvas.width - wmSize, canvas.height - wmSize);
         }
+
+        function applyPreset(p) {
+            if (!originalImg) return addMsg('ai', "Upload a photo first!");
+            renderCanvas(p);
+            addMsg('ai', `Applied ${p} filter!`);
+        }
+
+        async function send() {
+            const input = document.getElementById('text-input');
+            const val = input.value.trim();
+            if (!val) return;
+
+            addMsg('user', val);
+            input.value = '';
+
+            const apiKey = localStorage.getItem('optima_gemini_key');
+            if (!apiKey) {
+                addMsg('ai', "⚠️ Gemini API Key missing! Tap <strong>⚙️ Key</strong> at top right to paste your <code>AIzaSy...</code> key.");
+                return;
+            }
+
+            addMsg('ai', "Thinking with Gemini AI...");
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: `You are Optima AI, a photo editing assistant. Provide short, practical editing tips for this prompt: ${val}` }] }]
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.candidates && data.candidates[0].content.parts[0].text) {
+                    addMsg('ai', data.candidates[0].content.parts[0].text);
+                    
+                    const lower = val.toLowerCase();
+                    if (lower.includes('cinematic')) applyPreset('cinematic');
+                    else if (lower.includes('warm')) applyPreset('warm');
+                    else if (lower.includes('cool')) applyPreset('cool');
+                    else if (lower.includes('bw') || lower.includes('black')) applyPreset('bw');
+                } else if (data.error) {
+                    addMsg('ai', `API Error: ${data.error.message}`);
+                }
+            } catch (err) {
+                addMsg('ai', "Connection error. Please verify your internet and API key.");
+            }
+        }
+
         function downloadImage() {
             const canvas = document.getElementById('canvas');
             if (!originalImg) return;
@@ -148,17 +268,16 @@
             link.href = canvas.toDataURL();
             link.click();
         }
-        function send() {
-            const input = document.getElementById('text-input');
-            if (!input.value.trim()) return;
+
+        function addMsg(sender, txt) {
             const box = document.getElementById('messages');
-            box.innerHTML += `<div class="msg user">${input.value}</div>`;
-            const val = input.value;
-            input.value = '';
-            setTimeout(() => {
-                box.innerHTML += `<div class="msg ai">Processed instruction: "${val}"</div>`;
-            }, 400);
+            const d = document.createElement('div');
+            d.className = `msg ${sender}`;
+            d.innerHTML = txt;
+            box.appendChild(d);
+            box.scrollTop = box.scrollHeight;
         }
     </script>
 </body>
 </html>
+
